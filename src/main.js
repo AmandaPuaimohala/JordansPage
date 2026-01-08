@@ -314,43 +314,43 @@ export function createFlappyCloseButton(stopFlappyCallback) {
 /* -------------------- Loaders & Preloading -------------------- */
 const textureLoader = new THREE.TextureLoader();
 const dracoLoader = new DRACOLoader();
-dracoLoader.setDecoderPath('/draco/');
+dracoLoader.setDecoderPath('draco/');
 const gltfLoader = new GLTFLoader();
 gltfLoader.setDRACOLoader(dracoLoader);
 
 const bakedTextureMap = { 
-  woodFloor:'/images/floor.jpg', 
-  room:'/images/walls4k.jpg', 
-  Shelf:'/images/shelf.jpg',
-  rug:'/images/rug4k.jpg', 
-  bookStack:'/images/staticBooks.jpg', 
-  chair:'/images/chair.jpg', 
+  woodFloor:'images/floor.jpg', 
+  room:'images/walls4k.jpg', 
+  Shelf:'images/shelf.jpg',
+  rug:'images/rug4k.jpg', 
+  bookStack:'images/staticBooks.jpg', 
+  chair:'images/chair.jpg', 
   smallFurniture:'/images/sideTable.jpg', 
-  topRoom:'/images/topRoom.jpg', 
+  topRoom:'images/topRoom.jpg', 
   smallLanterninside:'/images/lights.jpg', 
-  plants:'/images/plants.jpg', 
-  globe:'/images/diffuse.jpg', 
-  Chihuahua:'/images/chis.jpg', 
-  milk:'/images/milk.jpg', 
-  cat:'/images/tekstura_kota.jpg', 
-  mug:'/images/mug.jpg', 
+  plants:'images/plants.jpg', 
+  globe:'images/diffuse.jpg', 
+  Chihuahua:'images/chis.jpg', 
+  milk:'images/milk.jpg', 
+  cat:'images/tekstura_kota.jpg', 
+  mug:'images/mug.jpg', 
   katana:'/images/katana.jpg', 
-  ground:'/images/Ground.jpg', 
-  daisy:'/images/daisy.jpg', 
-  windowOne:'/images/window1.jpg', 
-  windowTwo:'/images/window2.jpg', 
-  book1:'/images/book1.jpg', 
-  book2:'/images/book2.jpg', 
-  book3:'/images/book8.jpg', 
-  book4:'/images/book4.jpg', 
-  book5:'/images/book5.jpg', 
-  book6:'/images/book6.jpg', 
-  book53:'/images/book7.jpg', 
+  ground:'images/Ground.jpg', 
+  daisy:'images/daisy.jpg', 
+  windowOne:'images/window1.jpg', 
+  windowTwo:'images/window2.jpg', 
+  book1:'images/book1.jpg', 
+  book2:'images/book2.jpg', 
+  book3:'images/book8.jpg', 
+  book4:'images/book4.jpg', 
+  book5:'images/book5.jpg', 
+  book6:'images/book6.jpg', 
+  book53:'images/book7.jpg', 
   mountainDew:'/images/dew.jpg', 
-  pot:'/images/daisyPot.jpg', 
-  dinky:'/images/dinks.jpg', 
-  pillow:'/images/pillow.jpg',
-  frame: '/images/frame.jpg'
+  pot:'images/daisyPot.jpg', 
+  dinky:'images/dinks.jpg', 
+  pillow:'images/pillow.jpg',
+  frame: 'images/frame.jpg'
 };
 
 const bakedTextures = {};
@@ -363,7 +363,7 @@ Object.entries(bakedTextureMap).forEach(([name,path])=>{
 });
 
 let preloadedScene = null;
-gltfLoader.load('/models/JordanReadingRoom.glb', (gltf)=>{
+gltfLoader.load('models/JordanReadingRoom.glb', (gltf)=>{
   gltf.scene.traverse(child=>{
     if(!child.isMesh) return;
     if(bakedTextures[child.name]){

@@ -1,14 +1,14 @@
 let globeTimeout;
 
 export const globePlaces = [
-  { id: 'japan', title: '🌸', image: '/public/places/cherry.jpg', caption: '' },
-  { id: 'france', title: '', image: '/public/places/castle.jpg', caption: '' },
-  { id: 'bangkok', title: '🛺', image: '/public/places/bangkok.jpg', caption: '' },
-  { id: 'castle', title: '👸🏻👸🏼🏰', image: '/public/places/scot.jpg', caption: '' },
-  { id: 'china', title: '', image: '/public/places/wall.jpg', caption: '' },
-  { id: 'italy', title: '🏟', image: '/public/places/collum.jpg', caption: '⚔️' },
-  { id: 'lisbon', title: '', image: '/public/places/lisbon.jpg', caption: '' },
-  { id: 'cow', title: '🐄', image: '/public/places/cow.jpg', caption: 'Moooooo!' }
+  { id: 'japan', title: '🌸', image: 'places/cherry.jpg', caption: '' },
+  { id: 'france', title: '', image: 'places/castle.jpg', caption: '' },
+  { id: 'bangkok', title: '🛺', image: 'places/bangkok.jpg', caption: '' },
+  { id: 'castle', title: '👸🏻👸🏼🏰', image: 'places/scot.jpg', caption: '' },
+  { id: 'china', title: '', image: 'places/wall.jpg', caption: '' },
+  { id: 'italy', title: '🏟', image: 'places/collum.jpg', caption: '⚔️' },
+  { id: 'lisbon', title: '', image: 'places/lisbon.jpg', caption: '' },
+  { id: 'cow', title: '🐄', image: 'places/cow.jpg', caption: 'Moooooo!' }
 ];
 
 export function showGlobePlace(popup) {
