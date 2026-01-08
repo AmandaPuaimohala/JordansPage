@@ -363,6 +363,7 @@ Object.entries(bakedTextureMap).forEach(([name,path])=>{
 });
 
 let preloadedScene = null;
+let roomReady = false;
 gltfLoader.load('models/JordanReadingRoom.glb', (gltf)=>{
   gltf.scene.traverse(child=>{
     if(!child.isMesh) return;
@@ -374,6 +375,7 @@ gltfLoader.load('models/JordanReadingRoom.glb', (gltf)=>{
     }
   });
   preloadedScene = gltf.scene; 
+  roomReady = true;
 });
 
 /* -------------------- Event Handlers -------------------- */
@@ -410,14 +412,20 @@ window.addEventListener('mousemove', e=>{
 
 /* -------------------- Enter Button -------------------- */
 enterButton.addEventListener('click', () => {
+  if (!roomReady) {
+    enterButton.textContent = 'Loading...';
+    return;
+  }
+
   enterScreen.classList.add('exit');
   enterScreen.addEventListener('animationend', function handler() {
-    enterScreen.style.display = 'none'; 
-    scene.add(preloadedScene);           
-    startTick();                        
+    enterScreen.style.display = 'none';
+    scene.add(preloadedScene);
+    startTick();
     enterScreen.removeEventListener('animationend', handler);
   });
 });
+
 
 
 /* -------------------- Animation Loop -------------------- */
