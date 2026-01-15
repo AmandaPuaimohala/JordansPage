@@ -11,6 +11,7 @@ import { createFlappyBook } from './flappyBook.js';
 import { startAquarius } from './aquarius.js';
 import { startGhostEvent } from './ghostEvent.js';
 import { startWolfSpirits } from './wolf.js';
+import { createBook5 } from './book5.js';
 
 /* -------------------- Canvas & Core -------------------- */
 const canvas = document.querySelector('#experience-canvas');
@@ -369,6 +370,63 @@ export function createDaisyCloseButton(stopDaisyCallback, delay = 1000) {
   }, delay);
 }
 
+let book5CloseBtn = null;
+
+export function createBook5CloseButton(stopBook5Callback, delay = 1000) {
+  if (book5CloseBtn) return;
+
+  book5CloseBtn = document.createElement('button');
+  book5CloseBtn.textContent = '📖 Close 📖';
+
+  book5CloseBtn.style.cssText = `
+    position: absolute;
+    bottom: 40px;
+    left: 50%;
+    transform: translateX(-50%) translateY(10px);
+    padding: 14px 32px;
+    font-size: 1.05rem;
+    letter-spacing: 0.12em;
+    border-radius: 999px;
+    border: 1px solid rgba(214,195,163,0.4);
+    background: radial-gradient(circle at top, rgba(255,200,180,0.9), rgba(38, 0, 255, 0.9));
+    color: #fff;
+    cursor: pointer;
+    box-shadow: 0 0 18px rgba(255,180,200,0.5), 0 0 35px rgba(12, 0, 120, 0.6) inset;
+    backdrop-filter: blur(6px);
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 1.2s ease, transform 1.2s ease, box-shadow 0.3s ease;
+    z-index: 1000;
+  `;
+
+  book5CloseBtn.onmouseenter = () => {
+    book5CloseBtn.style.transform = 'translateX(-50%) translateY(6px) scale(1.05)';
+    book5CloseBtn.style.boxShadow = '0 0 30px rgba(255,180,255,0.8), 0 0 45px rgba(0, 13, 200, 0.8) inset';
+  };
+
+  book5CloseBtn.onmouseleave = () => {
+    book5CloseBtn.style.transform = 'translateX(-50%) translateY(6px) scale(1)';
+    book5CloseBtn.style.boxShadow = '0 0 18px rgba(255,150,255,0.5), 0 0 35px rgba(22, 8, 216, 0.6) inset';
+  };
+
+  book5CloseBtn.onclick = () => {
+    if (stopBook5Callback) stopBook5Callback();
+    book5CloseBtn.style.opacity = '0';
+    book5CloseBtn.style.pointerEvents = 'none';
+    setTimeout(() => {
+      book5CloseBtn.remove();
+      book5CloseBtn = null;
+    }, 800);
+  };
+
+  document.body.appendChild(book5CloseBtn);
+
+  setTimeout(() => {
+    book5CloseBtn.style.opacity = '1';
+    book5CloseBtn.style.pointerEvents = 'auto';
+    book5CloseBtn.style.transform = 'translateX(-50%) translateY(0px)';
+  }, delay);
+}
 
 
 /* -------------------- Loaders & Preloading -------------------- */
@@ -439,8 +497,9 @@ gltfLoader.load('models/JordanReadingRoom.glb', (gltf)=>{
   roomReady = true;
 });
 
+
 /* -------------------- Event Handlers -------------------- */
-let stopSheep=null, stopDaisy=null, stopGlobe=null, stopEightBall=null, stopFlappy=null, stopAquarius = null, stopGhost = null, stopWolf = null;
+let stopSheep=null, stopDaisy=null, stopGlobe=null, stopEightBall=null, stopFlappy=null, stopAquarius = null, stopGhost = null, stopWolf = null, stopBook5 = null;
 ; 
 let isEventActive = false;
 
@@ -474,6 +533,7 @@ function stopAllEvents(){
   if (stopAquarius) { stopAquarius(); stopAquarius = null; }
   if (stopGhost)    { stopGhost(); stopGhost = null; }
   if (stopWolf)     { stopWolf(); stopWolf = null; }
+  if (stopBook5) { stopBook5(); stopBook5 = null; }
 
   popup.style.display = 'none';
   isEventActive = false;
@@ -498,7 +558,7 @@ enterButton.addEventListener('click', () => {
     scene.add(preloadedScene);
     startTick();
 
-    // Play background music now, after the user clicks enter
+    
     bgMusic.play().catch(() => console.log("Music playback blocked."));
 
     enterScreen.removeEventListener('animationend', handler);
@@ -528,6 +588,22 @@ function startTick() {
       case 'book4':
         popupText.innerHTML = popupInfo[hovered.name];
         popup.style.display = 'block';
+        break;
+
+      case 'book5':
+        popup.style.display = 'none';
+        if (!stopBook5) {
+            
+            createBook5(scene, new THREE.Vector3(0, 2, 0)).then((stopFn) => {
+                stopBook5 = stopFn;
+                
+                createBook5CloseButton(() => {
+                    stopBook5?.();
+                    stopBook5 = null;
+                    isEventActive = false;
+                });
+            });
+        }
         break;
 
 
@@ -641,12 +717,12 @@ function startTick() {
       mesh.position.y = THREE.MathUtils.lerp(mesh.position.y, data.basePos.y + (isHover ? 0.3 : 0), 0.1);
       mesh.rotation.y = THREE.MathUtils.lerp(mesh.rotation.y, data.baseRot.y + (isHover ? 0 : 0), 0.1);
     });
-
+   
       // -------------------- Inside your tick() --------------------
       if (skyMode === 'daisy') {
-        skyTime += 0.0005; // slower progression
+        skyTime += 0.0005;
 
-        const t = (Math.sin(skyTime) + 1) / 2; // oscillates 0 → 1 → 0
+        const t = (Math.sin(skyTime) + 1) / 2; 
         const colorCount = tieDyeColors.length;
         const index = Math.floor(t * (colorCount - 1));
         const nextIndex = (index + 1) % colorCount;
@@ -656,7 +732,6 @@ function startTick() {
       } else {
         scene.background.lerp(normalBg, 0.05);
       }
-
 
 
     // -------------------- Camera Clamp --------------------
