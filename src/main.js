@@ -12,6 +12,7 @@ import { startAquarius } from './aquarius.js';
 import { startGhostEvent } from './ghostEvent.js';
 import { startWolfSpirits } from './wolf.js';
 import { createBook5 } from './book5.js';
+import { startPlaylistEvent } from './playlist.js';
 
 /* -------------------- Canvas & Core -------------------- */
 const canvas = document.querySelector('#experience-canvas');
@@ -63,7 +64,7 @@ let hovered = null;
 
 const INTERACTIVE_NAMES = [
   'book1','book2','book3','book4','book5','book6','book53',
-  'globe','daisy','Chihuahua',
+  'globe','daisy','Chihuahua','milk'
 ];
 
 const popupInfo = {
@@ -516,14 +517,93 @@ let skyMode = 'normal'; // normal | daisy
 let skyTime = 0;
 
 const flappy = createFlappyBook(scene, camera);
-const bgMusic = new Audio('sounds/heart.ogg');
-bgMusic.loop = true;
-bgMusic.volume = 0.05;
-bgMusic.play().catch(() => console.log("Autoplay prevented."));
+
+// -------------------- Playlist --------------------
+const playlistIframe = document.createElement('iframe');
+playlistIframe.src = 'https://www.youtube.com/embed/videoseries?list=PLeRzOrAgDarvWWFillWtLVXFykNtVQAn_&enablejsapi=1&autoplay=0';
+playlistIframe.style.cssText = `
+  width: 320px;
+  height: 180px;
+  display: none;
+  border-radius: 12px;
+  margin-bottom: 10px;
+`;
+playlistIframe.allow = 'autoplay; encrypted-media';
+document.body.appendChild(playlistIframe);
+
+let musicPanel = null;
+
+function createMusicPanel() {
+  if (musicPanel) return;
+
+  musicPanel = document.createElement('div');
+  musicPanel.style.cssText = `
+    position: absolute;
+    top: 50%;
+    right: 20px;
+    transform: translateY(-50%);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+    z-index: 1000;
+  `;
+
+  // Heading
+  const heading = document.createElement('div');
+  heading.textContent = 'Our Playlist 🎶';
+  heading.style.cssText = `
+    font-size: 1.2rem;
+    font-weight: bold;
+    color: #fff;
+    text-align: center;
+  `;
+  musicPanel.appendChild(heading);
+
+  // Add buttons
+  const btnNames = ['Play', 'Pause', 'Stop', 'Prev', 'Next'];
+  const buttons = {};
+
+  btnNames.forEach(name => {
+    const btn = document.createElement('button');
+    btn.textContent = name;
+    btn.style.cssText = `
+      padding: 10px 20px;
+      font-size: 1rem;
+      border-radius: 8px;
+      border: none;
+      background: #3b5a7d;
+      color: #fff;
+      cursor: pointer;
+    `;
+    musicPanel.appendChild(btn);
+    buttons[name] = btn;
+  });
+
+  document.body.appendChild(musicPanel);
+
+  // Button functions
+  function postCmd(cmd) {
+    setTimeout(() => {
+      playlistIframe.contentWindow?.postMessage(`{"event":"command","func":"${cmd}","args":""}`, '*');
+    }, 100);
+  }
+
+  buttons.Play.addEventListener('click', () => {
+    playlistIframe.style.display = 'block';
+    postCmd('playVideo');
+  });
+  buttons.Pause.addEventListener('click', () => postCmd('pauseVideo'));
+  buttons.Stop.addEventListener('click', () => {
+    postCmd('stopVideo');
+    playlistIframe.style.display = 'none';
+  });
+  buttons.Prev.addEventListener('click', () => postCmd('previousVideo'));
+  buttons.Next.addEventListener('click', () => postCmd('nextVideo'));
+}
 
 
 
-scene.background = normalBg;
 function stopAllEvents(){
   if (stopSheep)    { stopSheep(); stopSheep = null; scene.background = normalBg; setNightMode(false); }
   if (stopDaisy)    { stopDaisy(); stopDaisy = null; }
@@ -545,7 +625,6 @@ window.addEventListener('mousemove', e=>{
   mouse.y = -(e.clientY / sizes.height)*2+1;
 });
 
-/* -------------------- Enter Button -------------------- */
 enterButton.addEventListener('click', () => {
   if (!roomReady) {
     enterButton.textContent = 'Loading...';
@@ -558,13 +637,20 @@ enterButton.addEventListener('click', () => {
     scene.add(preloadedScene);
     startTick();
 
-    
-    bgMusic.play().catch(() => console.log("Music playback blocked."));
+    // Show playlist buttons
+    createMusicPanel();
+
+    // Start playlist automatically
+    playlistIframe.style.display = 'block';
+    setTimeout(() => {
+      playlistIframe.contentWindow?.postMessage(
+        '{"event":"command","func":"playVideo","args":""}', '*'
+      );
+    }, 100);
 
     enterScreen.removeEventListener('animationend', handler);
   });
 });
-
 
 
 /* -------------------- Animation Loop -------------------- */
@@ -575,6 +661,22 @@ function startTick() {
     stopAllEvents();
     isEventActive = true;
     switch (hovered.name) {
+
+      case 'milk':
+        stopAllEvents(); // stop other events first
+        // Pause background music if it's playing
+        if (!bgMusic.paused) bgMusic.pause();
+
+        // Start playlist popup
+        startPlaylistEvent(popup, 'PLeRzOrAgDarvWWFillWtLVXFykNtVQAn_');
+
+        // When the popup closes, resume bgMusic
+        const closeBtn = document.getElementById('closePlaylistBtn');
+        closeBtn.addEventListener('click', () => {
+            if (bgMusic.paused) bgMusic.play().catch(() => console.log("Music playback blocked."));
+        }, { once: true }); // { once: true } ensures this listener only runs once
+        break;
+
 
       case 'book3':
         popupText.textContent = popupInfo[hovered.name];
@@ -609,8 +711,13 @@ function startTick() {
 
       case 'daisy':
         popup.style.display = 'none';
+        isEventActive = true; // mark event as active
 
-        if (!bgMusic.paused) bgMusic.pause();
+        // Pause the playlist if it’s playing
+        playlistIframe.style.display = 'block'; // ensure iframe is there
+        playlistIframe.contentWindow?.postMessage(
+            '{"event":"command","func":"pauseVideo","args":""}', '*'
+        );
 
         skyMode = 'daisy';
         skyTime = 0;
@@ -620,12 +727,18 @@ function startTick() {
         createDaisyCloseButton(() => {
           skyMode = 'normal';
 
-          if (bgMusic.paused)
-            bgMusic.play().catch(() => console.log("Music blocked."));
+          stopDaisy?.();      // stop the daisy effect
+          stopDaisy = null;
+          isEventActive = false; // allow other events again
 
-          stopAllEvents();
+          // Optionally resume the playlist
+          playlistIframe.contentWindow?.postMessage(
+              '{"event":"command","func":"playVideo","args":""}', '*'
+          );
         });
         break;
+
+
 
       case 'Chihuahua':
         popupText.textContent = popupInfo[hovered.name];
@@ -663,7 +776,6 @@ function startTick() {
               });
           }
           break;
-
 
       case 'book53':
         popup.style.display = 'none';
@@ -718,7 +830,7 @@ function startTick() {
       mesh.rotation.y = THREE.MathUtils.lerp(mesh.rotation.y, data.baseRot.y + (isHover ? 0 : 0), 0.1);
     });
    
-      // -------------------- Inside your tick() --------------------
+      // -------------------- tick() --------------------
       if (skyMode === 'daisy') {
         skyTime += 0.0005;
 
