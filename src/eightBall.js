@@ -31,7 +31,7 @@ export function showEightBall(popup) {
   container.appendChild(input);
 
   const button = document.createElement('button');
-  button.textContent = 'Ask!';
+  button.textContent = 'ask Chihuahua psychic';
   button.style.cssText = `
     padding: 8px 16px;
     border-radius: 8px;
@@ -51,8 +51,8 @@ export function showEightBall(popup) {
   container.appendChild(answer);
 
   const responses = [
-    "✅",         
-    "❌",          
+    "Yess✅",         
+    "No",          
     "💯",         
     "ʻAe",        
     "ʻAʻole",     

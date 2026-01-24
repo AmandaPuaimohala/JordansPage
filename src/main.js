@@ -64,7 +64,7 @@ let hovered = null;
 
 const INTERACTIVE_NAMES = [
   'book1','book2','book3','book4','book5','book6','book53',
-  'globe','daisy','Chihuahua','milk'
+  'globe','daisy','Chihuahua',
 ];
 
 const popupInfo = {

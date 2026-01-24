@@ -202,7 +202,7 @@ export function createFlappyBook(scene, camera) {
 
   /* -------------------- BOOK CLICK -------------------- */
   book.onClick = () => {
-    overlayDiv.innerHTML = "Face Dinky Portrait and stand behind table.\nPress SPACE to flap!\nClick START to begin!";
+    overlayDiv.innerHTML = "Face Dinky Portrait and stand behind table.\nPress SPACE to flap.\n";
     overlayDiv.appendChild(startButton);
     overlayDiv.style.display = 'block';
   };
