@@ -568,7 +568,7 @@ function createMusicPanel() {
   `;
 
   const heading = document.createElement('div');
-  heading.textContent = 'Our Playlist 🎶';
+  heading.textContent = '🎶';
   heading.style.cssText = `
     font-size: 1.2rem;
     font-weight: bold;

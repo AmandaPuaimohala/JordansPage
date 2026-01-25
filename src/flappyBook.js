@@ -171,7 +171,7 @@ export function createFlappyBook(scene, camera) {
   function gameOver() {
     running = false;
     overlayDiv.innerHTML = `
-      Game Over!<br>Score: ${score}<br>Click START to play again!
+      Game Over!<br>Score: ${score}<br>
     `;
     overlayDiv.appendChild(startButton);
     gameGroup.visible = false;
